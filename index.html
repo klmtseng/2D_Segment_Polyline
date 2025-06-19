@@ -1,0 +1,84 @@
+<!--
+  Segment Polyline 2D Demo
+  Copyright (c) 2025 <YOUR NAME>
+  Released under the MIT License. See LICENSE file in this repository.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Segment Polyline – 2D Demo</title>
+<style>
+  body{margin:0;font-family:sans-serif;background:#eef1f5;height:100vh;display:flex;overflow:hidden}
+  #panel{width:320px;padding:1rem;overflow-y:auto;background:#fff;box-shadow:-2px 0 6px rgba(0,0,0,.12)}
+  #controls{display:flex;flex-wrap:wrap;gap:.7rem}
+  label{display:flex;flex-direction:column;font-size:.8rem}
+  input,select{width:6rem;padding:.25rem;border:1px solid #ccc;border-radius:4px}
+  button{padding:.4rem .8rem;font-size:1rem;border:none;border-radius:4px;background:#0069d9;color:#fff;cursor:pointer;flex:1 1 100%}
+  button:hover{background:#0053b3}
+  canvas{flex:1;background:#fff;border:none;cursor:crosshair}
+  pre{background:#fafafa;border:1px solid #eee;font-size:.74rem;max-height:160px;overflow:auto;padding:.4rem;flex:1 1 100%}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div id="panel">
+  <h3 style="margin:0 0 .5rem 0">⚙️ Parameters</h3>
+  <div id="controls">
+    <label>D<input id="D" type="number" step="1" min="1"/></label>
+    <label>Ratio mode<select id="ratioMode"><option value="fixed" selected>Fixed</option><option value="random">Random</option><option value="alternating">Alternating</option></select></label>
+    <label>ratio_min<input id="ratioMin" type="number" step="0.05" min="0.05" max="0.95"/></label>
+    <label>ratio_max<input id="ratioMax" type="number" step="0.05" min="0.05" max="0.95"/></label>
+    <label>n (segments)<input id="n" type="number" min="1" step="1"/></label>
+    <label>angle °<input id="angle" type="number" step="1"/></label>
+    <label>line width px<input id="lineW" type="number" step="0.2" title="Stroke width in pixels"/></label>
+    <label>Color mode<select id="colorMode"><option value="rainbow" selected>Rainbow</option><option value="reverse">Reverse</option><option value="random">Random</option></select></label>
+    <button id="resetBtn">Reset to defaults</button>
+    <button id="saveBtn">Save as PNG</button>
+    <pre id="info"></pre>
+  </div>
+</div>
+<script>
+// ===== Default values =====
+const defaults={D:100,ratioMode:'fixed',ratioMin:0.5,ratioMax:0.5,n:5,angle:30,lineW:2,colorMode:'rainbow'};
+
+const rad=d=>d*Math.PI/180;
+const rot=([x,y],a)=>{const c=Math.cos(a),s=Math.sin(a);return[c*x-s*y,s*x+c*y]};
+const cvs=document.getElementById('cvs');const ctx=cvs.getContext('2d');
+function resize(){cvs.width=window.innerWidth-340;cvs.height=window.innerHeight;draw();}
+window.addEventListener('resize',resize);
+
+function getRatio(i,mode,rMin,rMax){if(mode==='fixed')return rMin; if(mode==='random')return Math.random()*(rMax-rMin)+rMin; if(mode==='alternating')return i%2?rMax:rMin;}
+function build(D,rMin,rMax,mode,n,ang){let A=[-D/2,0],B=[D/2,0];const segs=[[A,B]];for(let i=1;i<n;i++){const AB=[B[0]-A[0],B[1]-A[1]];const r=getRatio(i-1,mode,rMin,rMax);const P=[A[0]+r*AB[0],A[1]+r*AB[1]];const unit=[AB[0]/D,AB[1]/D];const nd=rot(unit,ang);const N=[P[0]+nd[0]*D,P[1]+nd[1]*D];segs.push([P,N]);A=P;B=N;}return segs;}
+function pick(i,len,mode){if(mode==='random')return`hsl(${Math.floor(Math.random()*360)},70%,50%)`;if(mode==='reverse')return`hsl(${(1-i/len)*360},70%,50%)`;return`hsl(${i/len*360},70%,50%)`;}
+
+function draw(){const $=id=>document.getElementById(id);
+ const D=+$('D').value,n=+$('n').value,ang=rad(+$('angle').value),lw=+$('lineW').value,modeCol=$('colorMode').value;
+ const ratioMode=$('ratioMode').value,rMin=+$('ratioMin').value,rMax=+$('ratioMax').value;
+ const segs=build(D,rMin,rMax,ratioMode,n,ang);
+ const pts=segs.flat();let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;pts.forEach(([x,y])=>{minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);});
+ const pad=40;const scale=Math.min((cvs.width-2*pad)/(maxX-minX||1),(cvs.height-2*pad)/(maxY-minY||1));const OR={x:cvs.width/2-(minX+maxX)/2*scale,y:cvs.height/2+(minY+maxY)/2*scale};
+ ctx.clearRect(0,0,cvs.width,cvs.height);ctx.lineWidth=lw;
+ segs.forEach((seg,i)=>{const [a,b]=seg.map(p=>[OR.x+p[0]*scale,OR.y-p[1]*scale]);ctx.strokeStyle=pick(i,segs.length,modeCol);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();});
+ document.getElementById('info').textContent=`Segments: ${n} | Ratio mode: ${ratioMode}`;
+}
+
+function reset(){for(const k in defaults){const el=document.getElementById(k);if(!el)continue;if(el.tagName==='INPUT'){el.value=defaults[k];}else if(el.tagName==='SELECT'){el.value=defaults[k];}}
+ draw();}
+
+function savePNG(){// convert canvas to PNG and trigger download
+ const link=document.createElement('a');
+ link.download='polyline.png';
+ link.href=cvs.toDataURL('image/png');
+ link.click();
+}
+
+// Init events
+ document.getElementById('resetBtn').addEventListener('click',reset);
+ document.getElementById('saveBtn').addEventListener('click',savePNG);
+ document.querySelectorAll('#controls input,#controls select').forEach(el=>{if(!['resetBtn','saveBtn'].includes(el.id))el.addEventListener(el.tagName==='SELECT'?'change':'input',draw)});
+reset();
+resize();
+</script>
+</body>
+</html>
