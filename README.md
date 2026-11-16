@@ -1,80 +1,74 @@
-# Segment Polyline 2D/3D Demo
+# Segment Polyline 2D Demo
 
-Interactive web demo for generating chained line segments with controllable parameters such as length **D**, point ratio *p/D*, segment count *n*, turning angle, colour modes and (optionally) 3‑D rotation.
-
-
+Interactive web demo for generating chained line segments with controllable parameters such as length **D**, point ratio *p/D*, segment count *n*, turning angle, line width and colour modes.
 
 ---
 
-## ✨ Features
+## ✨ Features
 
-| Feature                                           | Description                                                        |
-| ------------------------------------------------- | ------------------------------------------------------------------ |
-| **2‑D mode**                                      | Draws a poly‑line on the *XY* plane only.                          |
-| **Optional 3‑D mode**                             | Toggle to extrude each new segment in 3‑D, drag mouse to rotate.   |
-| \*\*Flexible \*\*\`\`                             | Fixed, alternating, or random ratio between two bounds.            |
-| **Randomised ****\`\`**** & angle** (3‑D version) | Per‑segment length and yaw/pitch chosen from user‑supplied ranges. |
-| **Colour schemes**                                | Rainbow gradient, reverse gradient, or totally random.             |
-| **Animation**                                     | Optionally render segments one‑by‑one for a drawing effect.        |
-| **Reset button**                                  | Instantly restore the defaults listed below.                       |
+| Feature            | Description                                                                            |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| **2-D polyline**   | Each new segment starts at a point *p* on the previous one and turns by a fixed angle. |
+| **Ratio modes**    | Fixed, alternating, or random ratio between `ratio_min` and `ratio_max`.               |
+| **Colour schemes** | Rainbow gradient, reverse gradient, or totally random.                                 |
+| **Save as PNG**    | Download the current drawing as `polyline.png`.                                        |
+| **Reset button**   | Instantly restore the defaults listed below.                                           |
 
 ---
 
-## 🖥 Live Preview
+## 🖥 Live Preview
 
-Open \`\` in any modern browser — no build step required.
+Open `index.html` in any modern browser — no build step required.
 
 ---
 
-## 🔧 Default Parameters
+## 🔧 Default Parameters
 
 | Parameter               | Value         | Notes                                      |
 | ----------------------- | ------------- | ------------------------------------------ |
 | `D`                     | **100**       | Length of every new segment in pixels.     |
 | `ratioMode`             | **fixed**     | `fixed`, `random`, `alternating`.          |
-| `ratioMin` / `ratioMax` | **0.5 / 0.5** | Position of *p* along *AB* (0 → A, 1 → B). |
+| `ratioMin` / `ratioMax` | **0.5 / 0.5** | Position of *p* along *AB* (0 → A, 1 → B). |
 | `n`                     | **5**         | Number of segments.                        |
-| `angle`                 | **30°**       | 2‑D turning angle (counter‑clockwise).     |
-| `lineWidth`             | **2 px**      | Stroke thickness.                          |
+| `angle`                 | **30°**       | 2-D turning angle (counter-clockwise).     |
+| `lineWidth`             | **2 px**      | Stroke thickness.                          |
 | `colorMode`             | **rainbow**   | `rainbow`, `reverse`, `random`.            |
 
----
-
-## 📂 Project Structure
-
-```
-├── index.html          # main demo (English UI)
-├── assets/
-│   └── screenshot.png  # optional screenshot for README
-└── LICENSE             # choose your licence (MIT by default)
-```
-
-> **Note**: Chinese‑language versions of the demo are kept in the *canvas* history for reference.
+In `fixed` mode only `ratioMin` is used.
 
 ---
 
-## 🛠 Development
+## 📂 Project Structure
+
+```
+├── index.html          # the whole demo (HTML, CSS and JS in one file)
+├── README.md
+└── LICENSE             # MIT
+```
+
+---
+
+## 🛠 Development
 
 No external dependencies are required.
 
 ```bash
-# clone
-$ git clone https://github.com/<your‑user>/segment‑polyline.git
-$ cd segment‑polyline
+git clone https://github.com/klmtseng/2D_Segment_Polyline.git
+cd 2D_Segment_Polyline
 
 # open index.html in your browser
 ```
 
-Feel free to edit `index.html`; changes are hot‑reloaded on refresh.
+Feel free to edit `index.html`; refresh the page to see your changes.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing
 
 Pull requests are welcome. For major changes please open an issue first to discuss what you would like to change.
 
 ---
 
-## 📜 License
+## 📜 License
 
 Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
